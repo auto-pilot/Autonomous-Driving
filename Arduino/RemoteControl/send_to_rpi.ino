@@ -20,7 +20,6 @@ void setup(void){
   radio.openWritingPipe(0xc2c2c2c2c2LL);
   radio.openReadingPipe(1, 0xe7e7e7e7e7LL);
   radio.enableDynamicPayloads() ;
-  //radio.powerUp() ;
   radio.startListening();
   printf_begin();
   Serial.begin(9600);
@@ -28,34 +27,13 @@ void setup(void){
 }
 
 bool isDone;
-char coordinates[30];
-char sol_x[5];
-char sol_y[5];
-char sag_x[5];
-char sag_y[5];
+uint8_t coordinates[2];
 void loop(void){
-  sol_x_durum = analogRead(sol_x_ekseni);
-  sol_y_durum = analogRead(sol_y_ekseni);
-  sag_x_durum = analogRead(sag_x_ekseni);
-  sag_y_durum = analogRead(sag_y_ekseni);
-
-  itoa(sol_x_durum, sol_x, 10);
-  itoa(sol_y_durum, sol_y, 10);
-  itoa(sag_x_durum, sag_x, 10);
-  itoa(sag_y_durum, sag_y, 10);
-
-  strcpy(coordinates, sol_x);
-  strcat(coordinates, ",");
-  strcat(coordinates, sol_y);
-  strcat(coordinates, ",");
-  strcat(coordinates, sag_x);
-  strcat(coordinates, ",");
-  strcat(coordinates, sag_y);
-
-  Serial.println(coordinates);
+  coordinates[0] = map(analogRead(sol_y_ekseni), 0, 1023, 0, 255);
+  coordinates[1] = map(analogRead(sag_x_ekseni), 0, 1023, 0, 255);
   
   radio.stopListening();
-  isDone = radio.write(&coordinates, sizeof(coordinates));
+  radio.write(&coordinates, sizeof(coordinates));
   radio.startListening();
   delay(1);
 }
