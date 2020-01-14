@@ -3,6 +3,7 @@ GPIO.setmode(GPIO.BCM)
 from lib_nrf24 import NRF24
 import time
 import spidev
+import pigpio
 
 in3 = 22
 in4 = 24
@@ -17,10 +18,9 @@ GPIO.output(in4,GPIO.LOW)
 q=GPIO.PWM(ena,1000)
 q.start(25)
 
-GPIO.setup(17,GPIO.OUT)
-p = GPIO.PWM(17,50)
+pi = pigpio.pi()
+pi.set_mode(17, pigpio.OUTPUT)
 
-p.start(7.5)
 
 pipes = [[0xe7, 0xe7, 0xe7, 0xe7, 0xe7], [0xc2, 0xc2, 0xc2, 0xc2, 0xc2]]
 
@@ -49,8 +49,9 @@ radio2.printDetails()
 radio2.startListening()
 
 def to_angle(x):
-    return 2.5 + (7 / 255) * x
+    return 600 + (1400 / 255) * x
 
+c=1
 while True:
     pipe = [0]
     
@@ -70,10 +71,16 @@ while True:
     else :
         GPIO.output(in3,GPIO.LOW)
         GPIO.output(in4,GPIO.LOW)
-            
-    if coordinates[1] == 121 or coordinates[1] == 122:
-        p.ChangeDutyCycle(to_angle(160))
-    else:
-        p.ChangeDutyCycle(to_angle(coordinates[1]))
-
     
+    print(coordinates[1])
+    if coordinates[1] >= 121 and coordinates[1] < 170:
+        pi.set_servo_pulsewidth(17, 1500)
+        #time.sleep(1)
+    else:
+        #p.ChangeDutyCycle(to_angle(coordinates[1]))
+        pi.set_servo_pulsewidth(17, to_angle(coordinates[1]))
+        #time.sleep(1)
+
+pi.stop()
+    
+
