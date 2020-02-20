@@ -49,7 +49,18 @@ radio2.printDetails()
 radio2.startListening()
 
 def to_angle(x):
-    return 600 + (1400 / 255) * x
+    return 600 + (1400 / 255) * x #0-> 600 255->2000
+
+def to_speed(x):
+    speed = 0 + (100 / 127) * (x - 128)
+    speed = abs(speed)
+    if speed < 0:
+        return 0
+    elif speed > 100:
+        return 100
+    else:
+        return speed
+    
 
 c=1
 while True:
@@ -71,8 +82,8 @@ while True:
     else :
         GPIO.output(in3,GPIO.LOW)
         GPIO.output(in4,GPIO.LOW)
-    
-    print(coordinates[1])
+    q.ChangeDutyCycle(to_speed(coordinates[0]))
+    #print("x: {} y: {}".format(coordinates[0], to_speed(coordinates[0])))
     if coordinates[1] >= 121 and coordinates[1] < 170:
         pi.set_servo_pulsewidth(17, 1500)
         #time.sleep(1)
@@ -83,4 +94,5 @@ while True:
 
 pi.stop()
     
+
 
